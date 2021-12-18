@@ -103,7 +103,7 @@ def main():
         config.add("xes_helper", helper)
     pip_config_file = os.path.join(helper, "pip.inf")
     try:
-        with open(pip_config, "w", encoding="UTF-8") as f:
+        with open(pip_config_file, "w", encoding="UTF-8") as f:
             print("开始修改")
             f.write(pip_config)
     except IOError:
