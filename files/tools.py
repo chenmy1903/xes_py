@@ -13,7 +13,7 @@ index-url = https://pypi.org/simple/
 trusted-host=pypi.org
 """
 
-BASE_DIR = os.path.dirname(os.apth.abspath(__file__))
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 class Setting:
     def __init__(self, file_name, config={}, config_path="~/.duck_game/xes_py"):
