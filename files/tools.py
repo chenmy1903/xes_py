@@ -101,7 +101,7 @@ def main():
         print("寻找成功")
         print(f"path: {helper}")
         config.add("xes_helper", helper)
-    pip_config_file = os.path.join(helper, "pip.inf")
+    pip_config_file = os.path.join(helper, "pip.ini")
     try:
         with open(pip_config_file, "w", encoding="UTF-8") as f:
             print("开始修改")
