@@ -2,6 +2,8 @@ import os
 import sys
 import time
 import ctypes
+import requests
+import wmi
 
 from pickleshare import PickleShareDB
 
@@ -12,6 +14,8 @@ index-url = https://pypi.org/simple/
 [install]
 trusted-host=pypi.org
 """
+
+__version__ = "1.1"
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -62,32 +66,40 @@ def wait_time(t: int, text="程序将在{}秒后开始执行"):
     print('\r')
 
 
-def search_path(file_name):
+def search_path(file_name, disks=None):
     cp = os.walk("C:/")
-    count = 0
-    for root, dirs, files in cp:
-        root = str(root)
-        dirs = str(dirs)
-        count += 1
-        print(f"寻找文件：{count}", end="\r")
-        if file_name in dirs or file_name in files:
-            flag = 1
-            if "$Recycle.Bin" not in os.path.join(root, dirs):
-                return os.path.join(root, dirs)
-    print('')
+    w = wmi.WMI()
+    disks = [disk.Caption for disk in w.Win32_LogicalDisk(DriveType=3)] if not disks else disks
+    total = 0
+    print(f"总共有{len(disks)}个磁盘，准备扫描")
+    for disk in disks:
+        count = 0
+        for root, dirs, files in cp:
+            root = str(root)
+            dirs = str(dirs)
+            count += 1
+            total += 1
+            print(f"在{disk}中寻找文件：{count}个", end="\r")
+            if file_name in dirs or file_name in files:
+                flag = 1
+                if "$Recycle.Bin" not in os.path.join(root, dirs):
+                    return os.path.join(root, dirs)
+    print(f"寻找完成，一共{total}个文件")
     return None
 
 
 def main():
-    title("xes_py")
+    title("xes_py - version={}".format(__version__))
     config = Setting("config")
     print("欢迎使用xes_py")
+    print("版本：{}".format(__version__))
     print("本工具为xes编程助手的pip补丁")
     pause("按任何键继续安装")
     print("正在查找程序")
     try:
         if "xes_helper" not in config.read() or not config.read("xes_helper") or not os.path.isdir(config.read("xes_helper")):
-            helper = os.path.dirname(search_path("xes_py_helper.exe"))
+            helper_exe = search_path("xes_py_helper.exe")
+            helper = os.path.dirname(helper_exe) if helper_exe else None
         else:
             helper =  config.read("xes_helper")
     except KeyboardInterrupt:
@@ -110,6 +122,7 @@ def main():
         print("权限不足，请确认管理员")
         ctypes.windll.shell32.ShellExecuteW(None, "runas", " ".join(sys.argv), None, 1)
     print("成功")
+    pause()
     
 
 
